@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Target, Sparkles, Flame, CloudRain, Smile, Clock, TrendingUp, Camera, Plus, X, Zap, Heart } from 'lucide-react';
 
@@ -8,6 +7,9 @@ export default function OpusMVP() {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatting, setIsChatting] = useState(false);
   
   const [goals, setGoals] = useState([]);
   const [creatingGoal, setCreatingGoal] = useState(false);
@@ -47,7 +49,7 @@ export default function OpusMVP() {
 
     try {
       const base64Data = uploadedImage.split(',')[1];
-      const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyABDF-n59ASbYnftbqRpo_f50ZiNzUlK-w';
+      const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyAjlGVp3nIf3ICAxBA7BK06ZJt9HAD60cU';
       
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`,
@@ -87,7 +89,7 @@ export default function OpusMVP() {
 
     setIsAnalyzing(true);
     try {
-      const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyABDF-n59ASbYnftbqRpo_f50ZiNzUlK-w';
+      const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyAjlGVp3nIf3ICAxBA7BK06ZJt9HAD60cU';
       
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`,
@@ -129,6 +131,56 @@ export default function OpusMVP() {
       console.error('Goal error:', error);
     }
     setIsAnalyzing(false);
+  };
+
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isChatting) return;
+
+    const userMsg = { role: 'user', content: chatInput };
+    setChatMessages(prev => [...prev, userMsg]);
+    setChatInput('');
+    setIsChatting(true);
+
+    try {
+      const API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyAjlGVp3nIf3ICAxBA7BK06ZJt9HAD60cU';
+      
+      const conversationHistory = chatMessages.map(msg => 
+        msg.role === 'user' ? `Student: ${msg.content}` : `Opus: ${msg.content}`
+      ).join('\n');
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are Opus, a warm and encouraging art mentor for young artists, especially those from underrepresented communities and with special needs. 
+
+Previous conversation:
+${conversationHistory}
+
+Initial artwork feedback: ${analysis?.feedback || 'We just started talking'}
+
+Student says: ${chatInput}
+
+Respond with warmth, encouragement, and specific guidance. Be patient, affirming, and help them grow their skills and confidence. Keep responses conversational and supportive (2-4 sentences).`
+              }]
+            }]
+          })
+        }
+      );
+
+      const data = await response.json();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm here to support you! Tell me more about your creative journey.";
+      
+      setChatMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting right now, but I'm here for you!" }]);
+    }
+    setIsChatting(false);
   };
 
   const getFeelingEmoji = (feeling) => {
@@ -231,7 +283,7 @@ export default function OpusMVP() {
         }
         
         .gradient-text {
-          background: linear-gradient(135deg, #ffb7e4 0%, #f5cd56ff 50%, #bee2f0 100%);
+          background: linear-gradient(135deg, #ffb7e4 0%, #c8cd0f 50%, #bee2f0 100%);
           -webkit-background-clip: text !important;
           -webkit-text-fill-color: transparent !important;
           background-clip: text !important;
@@ -239,6 +291,7 @@ export default function OpusMVP() {
         }
       `}</style>
 
+      {/* SPLASH */}
       {showSplash && (
         <div className="fixed inset-0 z-50 gradient-pink flex items-center justify-center fade-in">
           <div className="text-center">
@@ -251,73 +304,82 @@ export default function OpusMVP() {
         </div>
       )}
 
+      {/* HOME - PINTEREST/VSCO STYLE */}
       {!showSplash && !currentMode && (
         <div className="min-h-screen p-8 lg:p-16">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20 slide-up">
-              <h1 className="text-7xl lg:text-8xl font-bold mb-6 heading gradient-text">
-                Welcome to Opus: What will you be working on today? </h1>
-              <p className="text-3xl text-gray-700 italic-accent max-w-3xl mx-auto">
-                Analyze your art, track your projects, and watch your work flourish
+            {/* Hero */}
+            <div className="text-center mb-12 lg:mb-20 slide-up">
+              <h1 className="text-4xl sm:text-5xl lg:text-8xl font-bold mb-4 lg:mb-6 heading gradient-text px-4">
+                YOUR CREATIVE COMMAND CENTER
+              </h1>
+              <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 italic-accent max-w-3xl mx-auto px-4">
+                Analyze your art, track your projects, and watch your craft flourish
               </p>
             </div>
 
+            {/* Asymmetric Layout - Pinterest Style */}
             <div className="relative">
-              <div className="absolute top-0 left-10 w-32 h-32 gradient-yellow blob opacity-20 float" style={{animationDelay: '0s'}}></div>
-              <div className="absolute bottom-20 right-10 w-40 h-40 gradient-blue blob opacity-20 float" style={{animationDelay: '1s'}}></div>
+              {/* Decorative Floating Elements */}
+              <div className="hidden lg:block absolute top-0 left-10 w-32 h-32 gradient-yellow blob opacity-20 float" style={{animationDelay: '0s'}}></div>
+              <div className="hidden lg:block absolute bottom-20 right-10 w-40 h-40 gradient-blue blob opacity-20 float" style={{animationDelay: '1s'}}></div>
               
+              {/* Main Cards - Staggered Grid */}
               <div className="grid lg:grid-cols-12 gap-8 relative z-10">
+                {/* Canvas Mode - Large Feature Card */}
                 <div 
                   className="lg:col-span-7 card-tilt cursor-pointer scale-in"
                   style={{animationDelay: '0.1s'}}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <div className="gradient-pink rounded-[4rem] p-12 shadow-2xl relative overflow-hidden group h-full">
+                  <div className="gradient-pink rounded-[3rem] lg:rounded-[4rem] p-8 lg:p-12 shadow-2xl relative overflow-hidden group h-full">
                     <div className="absolute top-8 right-8 w-24 h-24 bg-white bg-opacity-20 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
                     <div className="relative z-10">
-                      <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-xl">
-                        <Camera className="w-12 h-12 text-pink-500" strokeWidth={2} />
+                      <div className="w-16 h-16 lg:w-24 lg:h-24 bg-white rounded-full flex items-center justify-center mb-6 lg:mb-8 group-hover:scale-110 transition-transform shadow-xl">
+                        <Camera className="w-8 h-8 lg:w-12 lg:h-12 text-pink-500" strokeWidth={2} />
                       </div>
-                      <h2 className="text-6xl font-bold text-white mb-6 heading">CANVAS MODE</h2>
-                      <p className="text-2xl text-white leading-relaxed mb-8 italic-accent">
+                      <h2 className="text-4xl lg:text-6xl font-bold text-white mb-4 lg:mb-6 heading">CANVAS MODE</h2>
+                      <p className="text-lg lg:text-2xl text-white leading-relaxed mb-6 lg:mb-8 italic-accent">
                         Upload your artwork and receive deep visual analysis with actionable creative feedback
                       </p>
-                      <div className="flex items-center gap-3 text-white text-xl font-semibold">
+                      <div className="flex items-center gap-3 text-white text-lg lg:text-xl font-semibold">
                         <span>Upload Now</span>
-                        <Zap className="w-6 h-6" fill="currentColor" />
+                        <Zap className="w-5 h-5 lg:w-6 lg:h-6" fill="currentColor" />
                       </div>
                     </div>
                   </div>
                 </div>
 
+                {/* Goal Studio - Offset Smaller Card */}
                 <div 
                   className="lg:col-span-5 lg:mt-16 card-tilt cursor-pointer scale-in"
                   style={{animationDelay: '0.3s'}}
                   onClick={() => setCurrentMode('goals')}
                 >
-                  <div className="gradient-blue rounded-[4rem] p-10 shadow-2xl relative overflow-hidden group h-full">
+                  <div className="gradient-blue rounded-[3rem] lg:rounded-[4rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden group h-full">
                     <div className="absolute bottom-8 left-8 w-20 h-20 bg-white bg-opacity-20 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
                     <div className="relative z-10">
-                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-xl">
-                        <Target className="w-10 h-10 text-cyan-600" strokeWidth={2} />
+                      <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center mb-4 lg:mb-6 group-hover:scale-110 transition-transform shadow-xl">
+                        <Target className="w-8 h-8 lg:w-10 lg:h-10 text-cyan-600" strokeWidth={2} />
                       </div>
-                      <h2 className="text-5xl font-bold text-white mb-5 heading">GOAL STUDIO</h2>
-                      <p className="text-xl text-white leading-relaxed mb-6 italic-accent">
+                      <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 lg:mb-5 heading">GOAL STUDIO</h2>
+                      <p className="text-lg lg:text-xl text-white leading-relaxed mb-4 lg:mb-6 italic-accent">
                         Set creative goals, track emotional progress, and get personalized action steps
                       </p>
-                      <div className="flex items-center gap-3 text-white text-lg font-semibold">
+                      <div className="flex items-center gap-3 text-white text-base lg:text-lg font-semibold">
                         <span>Start Planning</span>
-                        <Heart className="w-5 h-5" fill="currentColor" />
+                        <Heart className="w-4 h-4 lg:w-5 lg:h-5" fill="currentColor" />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* Bottom Accent Card */}
               <div className="mt-8 scale-in" style={{animationDelay: '0.5s'}}>
                 <div className="gradient-lime rounded-[4rem] p-8 shadow-xl text-center">
-                  <p className="text-2xl text-white font-bold italic-accent">
-                    Created by Karla, Rhea, and Amrita 
+                  <p className="text-2xl text-white font-semibold italic-accent">
+                    ✨ AI-powered insights • Emotional tracking • Progress visualization ✨
                   </p>
                 </div>
               </div>
@@ -334,6 +396,7 @@ export default function OpusMVP() {
         </div>
       )}
 
+      {/* CANVAS MODE */}
       {currentMode === 'canvas' && (
         <div className="min-h-screen p-8">
           <div className="max-w-7xl mx-auto">
@@ -357,10 +420,10 @@ export default function OpusMVP() {
                 </div>
                 <div className="lg:col-span-2 flex flex-col justify-center slide-up">
                   <h2 className="text-6xl font-bold mb-6 heading gradient-text">
-                    YOUR uploaded work
+                    YOUR CANVAS
                   </h2>
                   <p className="text-2xl text-gray-700 mb-10 italic-accent leading-relaxed">
-                    Opus is ready to help you grow!
+                    Ready to discover what makes your art truly unique?
                   </p>
                   <button
                     onClick={analyzeArtwork}
@@ -369,8 +432,8 @@ export default function OpusMVP() {
                   >
                     {isAnalyzing ? (
                       <>
-                        <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                        Beautiful work! Analyzing now...
+                        <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                        Analyzing Magic...
                       </>
                     ) : (
                       <>
@@ -382,21 +445,81 @@ export default function OpusMVP() {
                 </div>
               </div>
             ) : (
-              <div className="grid lg:grid-cols-2 gap-10 scale-in">
-                <div className="bg-white rounded-[4rem] p-8 shadow-2xl">
-                  <img src={uploadedImage} alt="Artwork" className="w-full rounded-[3rem] shadow-lg" />
+              <div className="grid lg:grid-cols-5 gap-6 scale-in">
+                {/* Artwork stays visible */}
+                <div className="lg:col-span-2 bg-white rounded-[3rem] p-6 shadow-2xl">
+                  <img src={uploadedImage} alt="Artwork" className="w-full rounded-[2rem] shadow-lg" />
                 </div>
-                <div className="gradient-blue rounded-[4rem] p-12 shadow-2xl">
-                  <div className="flex items-center gap-5 mb-8">
-                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl">
-                      <Sparkles className="w-10 h-10 text-cyan-600" />
+
+                {/* Feedback + Chat */}
+                <div className="lg:col-span-3 space-y-6">
+                  {/* Initial Feedback */}
+                  <div className="gradient-blue rounded-[3rem] p-8 shadow-2xl">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl">
+                        <Sparkles className="w-8 h-8 text-cyan-600" />
+                      </div>
+                      <h3 className="text-4xl font-bold text-white heading">OPUS SAYS</h3>
                     </div>
-                    <h3 className="text-5xl font-bold text-white heading">Opus:</h3>
+                    <div className="bg-white bg-opacity-90 rounded-[2rem] p-6">
+                      <p className="text-lg text-gray-800 leading-relaxed whitespace-pre-wrap">
+                        {analysis.feedback}
+                      </p>
+                    </div>
                   </div>
-                  <div className="bg-white bg-opacity-90 rounded-[3rem] p-8">
-                    <p className="text-xl text-gray-800 leading-relaxed whitespace-pre-wrap">
-                      {analysis.feedback}
-                    </p>
+
+                  {/* Chat with Opus */}
+                  <div className="bg-white rounded-[3rem] p-8 shadow-2xl">
+                    <h4 className="text-2xl font-bold text-gray-900 mb-6 heading flex items-center gap-3">
+                      <Heart className="w-7 h-7 text-pink-500" />
+                      Continue the Conversation
+                    </h4>
+
+                    {/* Chat Messages */}
+                    <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto">
+                      {chatMessages.map((msg, idx) => (
+                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[80%] px-6 py-4 rounded-[2rem] ${
+                            msg.role === 'user' 
+                              ? 'gradient-pink text-white' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            <p className="leading-relaxed">{msg.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                      {isChatting && (
+                        <div className="flex justify-start">
+                          <div className="bg-gray-100 px-6 py-4 rounded-[2rem]">
+                            <div className="flex gap-2">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Chat Input */}
+                    <div className="flex gap-3">
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
+                        placeholder="Ask Opus anything about your art..."
+                        className="flex-1 px-6 py-4 rounded-full border-4 border-pink-200 focus:border-pink-400 focus:outline-none"
+                        disabled={isChatting}
+                      />
+                      <button
+                        onClick={sendChatMessage}
+                        disabled={!chatInput.trim() || isChatting}
+                        className="gradient-pink text-white px-8 py-4 rounded-full font-bold hover:shadow-xl transition-all disabled:opacity-50"
+                      >
+                        Send
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -405,13 +528,14 @@ export default function OpusMVP() {
         </div>
       )}
 
+      {/* GOAL STUDIO */}
       {currentMode === 'goals' && (
         <div className="min-h-screen p-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-12">
               <button
                 onClick={() => setCurrentMode(null)}
-                className="px-10 py-5 gradient-yellow rounded-full text-white font-bold hover:shadow-2xl transition-all"
+                className="px-8 py-4 gradient-yellow rounded-full text-gray-800 font-bold hover:shadow-2xl transition-all"
               >
                 ← Back Home
               </button>
@@ -420,7 +544,7 @@ export default function OpusMVP() {
                 className="gradient-pink text-white px-10 py-5 rounded-full font-bold text-xl flex items-center gap-3 hover:shadow-2xl transition-all"
               >
                 <Plus className="w-7 h-7" strokeWidth={3} />
-                Set a New Goal
+                New Goal
               </button>
             </div>
 
@@ -444,7 +568,7 @@ export default function OpusMVP() {
                         type="text"
                         value={newGoal.title}
                         onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
-                        placeholder="ex. Self Portrait Series, Watercolor Landscapes"
+                        placeholder="e.g., Portrait Series, Digital Landscape Collection"
                         className="w-full px-8 py-5 rounded-full border-4 border-pink-200 focus:border-pink-400 focus:outline-none text-lg"
                       />
                     </div>
@@ -457,14 +581,13 @@ export default function OpusMVP() {
                           onChange={(e) => setNewGoal({...newGoal, type: e.target.value})}
                           className="w-full px-8 py-5 rounded-full border-4 border-pink-200 focus:border-pink-400 focus:outline-none text-lg"
                         >
-                          <option value="">Select type</option>
+                          <option value="">Select type...</option>
                           <option value="painting">Painting</option>
                           <option value="digital">Digital Art</option>
                           <option value="sketch">Sketching</option>
                           <option value="sculpture">Sculpture</option>
                           <option value="photography">Photography</option>
                           <option value="mixed">Mixed Media</option>
-                          <option value="mixed">Other</option>
                         </select>
                       </div>
 
@@ -486,7 +609,7 @@ export default function OpusMVP() {
                         onChange={(e) => setNewGoal({...newGoal, progress: e.target.value})}
                         className="w-full px-8 py-5 rounded-full border-4 border-pink-200 focus:border-pink-400 focus:outline-none text-lg"
                       >
-                        <option value="">Select progress</option>
+                        <option value="">Select progress...</option>
                         <option value="not-started">Haven't started yet</option>
                         <option value="planning">In planning phase</option>
                         <option value="early">Just getting started</option>
@@ -529,7 +652,7 @@ export default function OpusMVP() {
                       <textarea
                         value={newGoal.notes}
                         onChange={(e) => setNewGoal({...newGoal, notes: e.target.value})}
-                        placeholder="Any specific challenges, inspirations, or thoughts you would like to add?"
+                        placeholder="Any challenges, inspirations, or thoughts?"
                         rows="4"
                         className="w-full px-8 py-5 rounded-[2rem] border-4 border-pink-200 focus:border-pink-400 focus:outline-none text-lg resize-none"
                       />
@@ -543,12 +666,12 @@ export default function OpusMVP() {
                       {isAnalyzing ? (
                         <>
                           <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                          Thinking of the best possible ways to approach this...
+                          Creating Magic...
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-7 h-7" />
-                          Create Personalized Goal & Get Action Steps
+                          Create Goal & Get Action Steps
                         </>
                       )}
                     </button>
