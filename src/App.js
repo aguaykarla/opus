@@ -304,29 +304,26 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
         </div>
       )}
 
-      {/* HOME - PINTEREST/VSCO STYLE */}
       {!showSplash && !currentMode && (
         <div className="min-h-screen p-8 lg:p-16">
           <div className="max-w-7xl mx-auto">
             {/* Hero */}
             <div className="text-center mb-12 lg:mb-20 slide-up">
               <h1 className="text-4xl sm:text-5xl lg:text-8xl font-bold mb-4 lg:mb-6 heading gradient-text px-4">
-                YOUR CREATIVE COMMAND CENTER
+                What will you be working on today?
               </h1>
               <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 italic-accent max-w-3xl mx-auto px-4">
-                Analyze your art, track your projects, and watch your craft flourish
+                Analyze your art, track your projects, and watch your art flourish
               </p>
             </div>
 
-            {/* Asymmetric Layout - Pinterest Style */}
             <div className="relative">
-              {/* Decorative Floating Elements */}
+
               <div className="hidden lg:block absolute top-0 left-10 w-32 h-32 gradient-yellow blob opacity-20 float" style={{animationDelay: '0s'}}></div>
               <div className="hidden lg:block absolute bottom-20 right-10 w-40 h-40 gradient-blue blob opacity-20 float" style={{animationDelay: '1s'}}></div>
               
-              {/* Main Cards - Staggered Grid */}
               <div className="grid lg:grid-cols-12 gap-8 relative z-10">
-                {/* Canvas Mode - Large Feature Card */}
+
                 <div 
                   className="lg:col-span-7 card-tilt cursor-pointer scale-in"
                   style={{animationDelay: '0.1s'}}
@@ -350,7 +347,6 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
                   </div>
                 </div>
 
-                {/* Goal Studio - Offset Smaller Card */}
                 <div 
                   className="lg:col-span-5 lg:mt-16 card-tilt cursor-pointer scale-in"
                   style={{animationDelay: '0.3s'}}
@@ -379,7 +375,7 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
               <div className="mt-8 scale-in" style={{animationDelay: '0.5s'}}>
                 <div className="gradient-lime rounded-[4rem] p-8 shadow-xl text-center">
                   <p className="text-2xl text-white font-semibold italic-accent">
-                    ✨ AI-powered insights • Emotional tracking • Progress visualization ✨
+                    Created by Karla, Rhea, and Amrita | Dedicated to motivating young creatives everywhere
                   </p>
                 </div>
               </div>
@@ -423,7 +419,7 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
                     YOUR CANVAS
                   </h2>
                   <p className="text-2xl text-gray-700 mb-10 italic-accent leading-relaxed">
-                    Ready to discover what makes your art truly unique?
+                    Ready to explore what makes your art unique?
                   </p>
                   <button
                     onClick={analyzeArtwork}
@@ -433,7 +429,7 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
                     {isAnalyzing ? (
                       <>
                         <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                        Analyzing Magic...
+                        Analyzing Artwork...
                       </>
                     ) : (
                       <>
@@ -588,6 +584,7 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
                           <option value="sculpture">Sculpture</option>
                           <option value="photography">Photography</option>
                           <option value="mixed">Mixed Media</option>
+                          <option value="mixed">Oil Pastel</option>
                         </select>
                       </div>
 
@@ -666,7 +663,7 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
                       {isAnalyzing ? (
                         <>
                           <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                          Creating Magic...
+                          Thinking...
                         </>
                       ) : (
                         <>
