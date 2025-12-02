@@ -375,7 +375,7 @@ Respond with warmth, encouragement, and specific guidance. Be patient, affirming
               <div className="mt-8 scale-in" style={{animationDelay: '0.5s'}}>
                 <div className="gradient-lime rounded-[4rem] p-8 shadow-xl text-center">
                   <p className="text-2xl text-white font-semibold italic-accent">
-                    Created by Karla, Rhea, and Amrita | Dedicated to motivating young creatives everywhere
+                    Created by Karla, Rhea, and Amrita 
                   </p>
                 </div>
               </div>
